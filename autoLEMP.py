@@ -46,11 +46,11 @@ def runServerCommand(someCommand,user,whatIP):
     
 2. Now we try and install LEMP 
     -Tut = https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-in-ubuntu-16-04
-    -skip =
 
-3. Install Wordpress -- you 
+3. Install Wordpress
     -Tut = https://www.digitalocean.com/community/tutorials/how-to-install-wordpress-with-lemp-on-ubuntu-16-04
-4. Do LetsEncrypt
+
+4. Do LetsEncrypt -- now that you know how to run the server commands you got this
     -Tut = https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04
 
 """
