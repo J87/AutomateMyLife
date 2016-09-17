@@ -23,6 +23,8 @@ def runLocalCommand(someCommand):
 
 def runServerCommand(someCommand,user,whatIP):
     """this function adds the ssh user@server in front of the command to run instances on a server"""
+    #the key here was the "-t" flag and joining each command you send
+    #to the user@ip location
     someCommand = "ssh -t "+user+"@"+whatIP+" '"+someCommand+"'"
     print "Opening the Server running: ",someCommand
     #proc = Popen(someCommand,stdout=PIPE,shell=True) #True opens its own terminal
