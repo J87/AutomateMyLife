@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
 #here is where we import the subprocess package
-from subprocess import Popen, PIPE,call,check_output #docs -- https://docs.python.org/2/library/subprocess.html
-import webbrowser #for checking our website has installed Nginx
+from subprocess import Popen, PIPE,check_output #docs -- https://docs.python.org/2/library/subprocess.html
+import webbrowser #for checking to see if our website has installed Nginx
 import os #pretty standard import for operating system
 
-#os.system("gnome-terminal")
-#raw_input("hold")
 #now that we loaded the package
 #lets define a function that we can send terminal commands to run
-
+def runCommand(someCommand):
+    """test function just to show we can work with the terminal"""
+    print "Opening a terminal to execute: ",someCommand
+    proc = Popen(someCommand,stdout=PIPE,shell=True) #True opens a terminal instance using a string input
+    
 def runLocalCommand(someCommand):
-    """this function opens a terminal instance and executes 'someCommand' """
+    """this function opens a terminal instance and executes 'someCommand' but only does it locally """
     print "Opening the terminal and using: ",someCommand
     #proc = Popen(someCommand,stdout=PIPE,shell=True) #True opens its own terminal
     proc = Popen(someCommand,shell=True)
@@ -20,7 +22,7 @@ def runLocalCommand(someCommand):
     print proc_stdout
 
 def runServerCommand(someCommand,user,whatIP):
-    """this function adds the ssh user@server in front of the command"""
+    """this function adds the ssh user@server in front of the command to run instances on a server"""
     someCommand = "ssh -t "+user+"@"+whatIP+" '"+someCommand+"'"
     print "Opening the Server running: ",someCommand
     #proc = Popen(someCommand,stdout=PIPE,shell=True) #True opens its own terminal
@@ -28,56 +30,54 @@ def runServerCommand(someCommand,user,whatIP):
     proc_stdout = proc.communicate()[0]
     print proc_stdout
 
-#let us try a simple task -- see if you can find where your python code autoLemp.py
-#runCommand('cd ~/Desktop; ls')
-#print "SUCCESS!!!"
-#runCommand('cd')
-#>>>Opening the terminal and using:  cd ~/Desktop; ls
-#>>>autoLEMP.py
-
 
 #################Now explode the simple use to the make our LEMP Stack automation
 
 """
 HERE is the process --
-0. Obtain a VPS through Digital Ocean by making a Droplet and Go purchase a URL
+#DISCLAIMER(s) -- if there are config files to edit -- which there are -- you are still going to have to refer to the tutorials
+#to make sure you edit them correctly.  This is just automating the bash commands for you
+#also, this tutorial is meant for LINUX/UNIX only and is not made for Windows
+
+0. Obtain a VPS through Digital Ocean by making a Droplet - know your IP (you can also purchase a URL if you want)
 1. Connect to your Digital Ocean server from the terminal using SSH
     -Tut = https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-16-04
-    -skip = Step Four and Five if you are brave
+    -skip = steps Four (and Five) could be skipped but that means you will have to enter your server passwd 2X more
     
-2. Now we try and install LEMP -- although not all of this can be Automated
+2. Now we try and install LEMP 
     -Tut = https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-in-ubuntu-16-04
     -skip =
 
-3. Install Wordpress --
+3. Install Wordpress -- you 
     -Tut = https://www.digitalocean.com/community/tutorials/how-to-install-wordpress-with-lemp-on-ubuntu-16-04
 4. Do LetsEncrypt
     -Tut = https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04
 
 """
 
-
-
 def connectToServer(userAccount,whatIP):
     bashCommand = 'ssh '+userAccount+'@'+whatIP+''
     runLocalCommand(bashCommand)
 
-
 def doServerUpdates(user,whatIP):
+    """Good practice to always update your Linux when you first login"""
     bash = 'sudo apt-get update && sudo apt-get upgrade'
     runServerCommand(bash,user,whatIP)
     
 
 def doUpdates():
+    """this can do local linux updates"""
     bash = 'sudo apt-get update && sudo apt-get upgrade'
     runLocalCommand(bash)
     
     
 def makeSudoUser(newUserName,whatIP):
+    """adds the new user and gives them Sudo permission"""
     makeNewUser = "adduser "+newUserName+""
     runServerCommand(makeNewUser,'root',whatIP)
     giveSudoPriv ="usermod -aG sudo "+newUserName+""
     runServerCommand(giveSudoPriv,'root',whatIP)
+
 
 def generateKeys(user,whatIP):
     """ONLY DO THIS ONCE!!"""
@@ -139,6 +139,7 @@ def installPHP(user,whatIP):
 
     b4 = "sudo systemctl restart php7.0-fpm"
     runServerCommand(b4,user,whatIP)
+
 
 def configNginxPHP(user,whatIP):
     """this takes some manual labor"""
@@ -234,6 +235,7 @@ def runOnce(newUser,myIP):
     ##generate a key
     generateKeys(newUser,myIP)
     
+    
 def makeLEMP(newUser):
     """AUTOMATE MY LEMP install!!"""
     
@@ -265,14 +267,16 @@ def makeLEMP(newUser):
     runLocalCommand(b1)
 
 
-
+###first test
+runCommand('cd ~/Desktop; ls; cd')
+#if this worked you should see a list of whatever is on your desktop
 
     
 ###Globals
 global myIP
 global newUser
 myIP = "YOUR IP ADD HERE"
-newUser = "YOUR USER NAME"
+newUser = "YOUR NEW USER NAME"
 
 ###Main Loop
 
