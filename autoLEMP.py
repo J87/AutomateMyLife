@@ -34,7 +34,7 @@ def runServerCommand(someCommand,user,whatIP):
 #################Now explode the simple use to the make our LEMP Stack automation
 
 """
-HERE is the process --
+#HERE is the process --
 #DISCLAIMER(s) -- if there are config files to edit -- which there are -- you are still going to have to refer to the tutorials
 #to make sure you edit them correctly.  This is just automating the bash commands for you
 #also, this tutorial is meant for LINUX/UNIX only and is not made for Windows
