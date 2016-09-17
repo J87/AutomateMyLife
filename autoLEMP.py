@@ -83,11 +83,13 @@ def makeSudoUser(newUserName,whatIP):
 
 def generateKeys(user,whatIP):
     """ONLY DO THIS ONCE!!"""
+    #removes any previous keys on both local and remote
     b0 = "ssh-keygen -R "+whatIP+""
     runLocalCommand(b0)
-    
+    #this generates an RSA key locally
     b1 = 'ssh-keygen'
     runLocalCommand(b1)
+    #this copies that RSA to your remote server
     b2 = 'ssh-copy-id '+user+'@'+whatIP+''
     runLocalCommand(b2)
     
