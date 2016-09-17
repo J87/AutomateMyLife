@@ -43,7 +43,7 @@ HERE is the process --
 0. Obtain a VPS through Digital Ocean by making a Droplet and Go purchase a URL
 1. Connect to your Digital Ocean server from the terminal using SSH
     -Tut = https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-16-04
-    -skip = Step Four and Five
+    -skip = Step Four and Five if you are brave
     
 2. Now we try and install LEMP -- although not all of this can be Automated
     -Tut = https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-in-ubuntu-16-04
@@ -224,7 +224,7 @@ def runOnce(newUser,myIP):
     connectToServer('root',myIP)
 
     ###make a new user name and give them SUDO permissions
-    newUser = 'auto'
+    newUser = newUser
     makeSudoUser(newUser,myIP)
     #generateKeys(newUser,myIP)
     
@@ -271,11 +271,9 @@ def makeLEMP(newUser):
 ###Globals
 global myIP
 global newUser
-myIP = "104.131.137.230"#"YOUR IP ADD HERE"
-newUser = "auto"#"YOUR USER NAME"
-#cf38136d89ebb1d4
-#@ut0T3st!
-#t3st@uto
+myIP = "YOUR IP ADD HERE"
+newUser = "YOUR USER NAME"
+
 ###Main Loop
 
 #runOnce(newUser,myIP)
