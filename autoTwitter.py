@@ -49,8 +49,8 @@ class listener(StreamListener):
             #make the data into a json object
             #it looks like a dictionary anyway
             all_data = json.loads(data)
-
-   			tweetTime = all_data["created_at"]
+            
+            tweetTime = all_data["created_at"]
             tweet = all_data["text"]
             username = all_data["user"]["screen_name"]
 
