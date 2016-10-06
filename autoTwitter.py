@@ -55,7 +55,8 @@ class listener(StreamListener):
             username = all_data["user"]["screen_name"]
 
             #who is saying what?
-            print username," says -- ",tweet
+            print "At ",tweetTime," ",username," says --\n ",tweet
+            print "\n Oh No they Didn\\'t!!!"
             
             #where are they saying it from? in what language?
             country = all_data["place"]["country"]
