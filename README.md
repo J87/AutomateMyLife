@@ -6,4 +6,4 @@ code for the Automate My Life blog at www.automatemylife.org
 https://automatemylife.org/automate-a-lemp-wordpress-server-install/
 
 #Create your own SEO Strategy and use Twitter API to find your readers
-https://automatemylife.org/	
+https://automatemylife.org/grassroots-seo-knowing-audience-python/
