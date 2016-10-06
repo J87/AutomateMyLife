@@ -25,12 +25,6 @@ Tweepy ref - http://docs.tweepy.org/en/v3.5.0/api.html
 """
 
 
-#replace mysql.server with "localhost" if you are running via your own server!
-#server   MySQL username	MySQL pass  Database name.
-conn = MySQLdb.connect("mysql.server","beginneraccount","cookies","beginneraccount$tutorial")
-c = conn.cursor()
-
-
 ckey = 'your consumer key'
 csecret = 'your consumer secret'
 atoken = 'your access token'
@@ -76,6 +70,10 @@ class listener(StreamListener):
             #get a unix timestamp
             saveThis = str("User: "+username+" Text: "+tweet) #twitter uses colons sometimes so we have to some up with a different method
 
+            #save into a csv or a db
+            saveCSV = "Y"
+            saveDB = "N"
+
             ###if you want to save to a csv
             if saveCSV == "Y":
 	            saveFile = open('twitDB.csv','a')
@@ -83,10 +81,14 @@ class listener(StreamListener):
 	            saveFile.write('\n')
 	            saveFile.close()
 
-	        elif saveDB == "Y":
-				c.execute("INSERT INTO rolodex (tweetTime, username, tweet, importantLinks, country, language) VALUES (%s,%s,%s,%s,%s,%s)",
-				(tweetTime, username, tweet, importantLinks, country, language))
-				conn.commit()
+	        #if saveDB == "Y":
+            #    #replace mysql.server with "localhost" if you are running via your own server!
+            #    #server   MySQL username    MySQL pass  Database name.
+            #    conn = MySQLdb.connect("mysql.server","beginneraccount","cookies","beginneraccount$tutorial")
+            #    c = conn.cursor()
+			#	c.execute("INSERT INTO rolodex (tweetTime, username, tweet, importantLinks, country, language) VALUES (%s,%s,%s,%s,%s,%s)",
+			#	(tweetTime, username, tweet, importantLinks, country, language))
+			#	conn.commit()
 
 	        #keep the light on
             return True
