@@ -7,3 +7,6 @@ https://automatemylife.org/automate-a-lemp-wordpress-server-install/
 
 #Create your own SEO Strategy and use Twitter API to find your readers
 https://automatemylife.org/grassroots-seo-knowing-audience-python/
+
+#Interact with your Spotify Premium account and stream some songs
+https://automatemylife.org/
