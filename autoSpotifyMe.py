@@ -136,28 +136,21 @@ def getURI(searchTerm):
 
 # Assuming a spotify_appkey.key in the current dir
 session = spotify.Session()
-
 # Process events in the background
 loop = spotify.EventLoop(session)
 loop.start()
-
 # Connect an audio sink - alsaSink is used on unix systems
 audio = spotify.AlsaSink(session)
-
 
 # Events for coordination
 logged_in = threading.Event()
 end_of_track = threading.Event()
-
-
 # Register event listeners
 session.on(spotify.SessionEvent.CONNECTION_STATE_UPDATED, on_connection_state_updated)
 session.on(spotify.SessionEvent.END_OF_TRACK, on_end_of_track)
-
 # Assuming a previous login, we may want to logout, especially if remember_me=True previously
 session.logout() #clear out any priors just in case
 session.forget_me()
-
 try:
 	session.relogin()
 	print "I re-logged you in good Sir..."
