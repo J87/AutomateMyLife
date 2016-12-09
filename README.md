@@ -9,4 +9,7 @@ https://automatemylife.org/automate-a-lemp-wordpress-server-install/
 https://automatemylife.org/grassroots-seo-knowing-audience-python/
 
 #Interact with your Spotify Premium account and stream some songs
-https://automatemylife.org/
+https://automatemylife.org/stream-spotify-python/
+
+#Create your own website's keyword WordCloud using any image
+https://automatemylife.org/defining-your-keywords-using-nlp
