@@ -34,6 +34,7 @@ import imutils
 ##imports for wordcloud
 from os import path
 from PIL import Image
+import seaborn
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS
 
@@ -41,8 +42,8 @@ from wordcloud import WordCloud, STOPWORDS
 
 #initialize some arrays you will use
 visitedLinks = []
-badList = ['WHERE ALL YOUR WEB MINING STOPWORDS GO -- AS YOU PLAY AROUND WITH NLTK']
-
+badList = ["WORDS and PHRASES THAT YOU USE TO HELP WEED OUT CRAWLING EFFORT"
+          ]
 
 def openPageGetSource(url):
     """opens a url and ingests the sites source code"""
@@ -186,8 +187,20 @@ def mineWebsite(randomURL,imageFname):
                                     
                         #add the words to a dataframe
                         DF = pd.DataFrame(wordArray,columns=['Tokens'])
-                        print DF
+                        #print DF
 
+                        #make a quick graph
+                        DF['Count'] = 1
+                        a = DF.groupby('Tokens').sum().reset_index()
+                        b = a[a['Count']>1]
+                        print b
+                        b= b.sort('Count',ascending=False)
+                        ax = b.plot(kind='bar',stacked=False)
+                        ax.set_ylabel('Frequency')
+                        ax.set_xticklabels(b['Tokens'].values)
+                        plt.show()
+                        
+                        
                         #send to an output file -- or this could be a DB
                         DF.to_csv('outputTest.csv')
 
@@ -206,6 +219,6 @@ def mineWebsite(randomURL,imageFname):
 
         
 #inputs to start wordcloud
-randomURL = "SOME WEBSITE LOCATION"
-imageFname = "SOME IMAGE FILE YOU WANT TO USE"
+randomURL = "ENTER YOUR URL HERE"
+imageFname = "PICTURE FILENAME HERE"
 mineWebsite(randomURL,imageFname)
