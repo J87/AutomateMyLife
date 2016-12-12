@@ -45,6 +45,7 @@ visitedLinks = []
 badList = ["WORDS and PHRASES THAT YOU USE TO HELP WEED OUT CRAWLING EFFORT"
           ]
 
+
 def openPageGetSource(url):
     """opens a url and ingests the sites source code"""
     try:
@@ -64,10 +65,10 @@ def getGrayImage(imageFname):
     """this converts any color image to binary - black and white - for wordcloud"""
     imagePath = os.path.join(os.getcwd(),'imgs',imageFname)
     im_gray = cv2.imread(imagePath,cv2.CV_LOAD_IMAGE_GRAYSCALE)
-    im_gray = imutils.resize(im_gray,width=1000)
+    im_gray = imutils.resize(im_gray,width=2000)
 
     #this calculates the threshold for you and makes it black and white
-    (thresh, im_bw) = cv2.threshold(im_gray,128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    (thresh, im_bw) = cv2.threshold(im_gray,0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
     #bw image is great but wordcloud assigns words to black space - need inverse
     mask_inv = cv2.bitwise_not(im_bw)
