@@ -1,15 +1,13 @@
-# AutomateMyLife - www.automatemylife.org
-code for the Automate My Life blog at www.automatemylife.org
+# AutomateMyLife - A Data Scientist's Hobby Shop
+Tutorials for the Automate My Life blog at www.automatemylife.org
 
+autoLEMP -- automation code that helps you insall a LEMP stack on DigitalOcean with WordPress
 
-#Automate a LEMP + Wordpress Server install
-https://automatemylife.org/automate-a-lemp-wordpress-server-install/
+autoTwitter -- using Tweepy and trying to find an audience that will listen
 
-#Create your own SEO Strategy and use Twitter API to find your readers
-https://automatemylife.org/grassroots-seo-knowing-audience-python/
+autoTwitterScheduler -- automatically posts my Blogs to Twitter (it's pretty neat!)
 
-#Interact with your Spotify Premium account and stream some songs
-https://automatemylife.org/stream-spotify-python/
+autoSpotifyMe -- stream Spotify with Python
 
-#Create your own website's keyword WordCloud using any image
-https://automatemylife.org/defining-your-keywords-using-nlp
+autoWordCloud -- generating a WordCloud after your mine your own website!!
+
