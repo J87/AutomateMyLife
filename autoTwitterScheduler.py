@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
+import random
 
 #twitter imports
 from tweepy import Stream,API
@@ -10,13 +11,15 @@ import time #we will use this to limit our consumption
 import json #to capture the tweets
 
 #web crawling imports
-import urllib2
-from urllib2 import urlopen
+import requests
+#requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ':RC4-SHA'
 from bs4 import BeautifulSoup
 
 #import timing for scheduling
-import schedule #this is a cool new package I found!
+import schedule
 import time
+import threading
+
 
 """--------------The Process------------
 Tweepy ref - http://docs.tweepy.org/en/v3.5.0/api.html
@@ -40,60 +43,12 @@ csecret = 'YOUR CONSUMER SECRET'
 atoken = 'YOUR ACCESS TOKEN'
 asecret = 'YOUR ACCESS SECRET'
 
-#initialize some arrays you will use
-try:
-    #bring in your urls from the database
-    visitedLinks = pd.read_csv('visitedLinks.csv')
-    visitedLinks = visitedLinks['Links'].unique().tolist()
-except Exception,e:
-    print str(e)
-    isArray = True
-    #if theres no file, just write to an array for now
-    print "couldnt find the visited links file, using an array"
-    visitedLinks = []
 
-#all the stuff you weed out from crawling your site
-badList = ['these can be special characters',
-          'etc']
-
-#lets make a random phrase list -- could also be a db you bring in
-#here you can put specific phrases matching a post
-randomPhraseList = ['Ever wonder how people on twitter are always posting 24-7?',
-                    'Automation in Python is my fav',
-                    'Automating my tweets was more time consuming than I thought',
-                    'Glad I automated these posts though',
-                    'Now I can sit back and relax',
-                    'Tweeting my posts from Python',
-                    'Such is the awesomeness of',
-                    'WIN blog',
-                    'Oh ya maybe I should work on my own Amazon Echo because I love @Spotify',
-                    'Now to start typing up the Twitter Scheduler tutorial',
-                    'Who has time to be on Twitter 24-7 these days?',
-                    'Automate your Twitter posts instead']
-
-#oh yea, maybe we should add the fancy hashtag and at sign
-#to the tweet as well
-#using the keywords we focus on give them hashtags
-closing = ['#datascience #python #automatemylife #wordcloud @PyRunner',
-           '#wordcloud #datascience @PyRunner',
-           '#datascience #wordcloud @PyRunner',
-           '@PyRunner the #mechiedataist #datascience',
-           '#data @PyRunner ',
-           '#datascience #automatemylife @PyRunner',
-           '#datascience #automatemylife @PyRunner',
-           '#automatemylife by @PyRunner',
-           '@SpotifyEng #automatemylife @PyRunner',
-           '#automatemylife from python with @PyRunner',
-           '',
-           '',
-           '']
-
-#set a delay between your tweets
-#so you dont post all of them so quickly
-timeDelayTweets = 120
+timeDelay = random.randint(10,120)
 
 #make api accesible globally
 global api
+global auth
 
 def signIntoTwitter():
     """signs you into twitter"""
@@ -106,206 +61,105 @@ def signIntoTwitter():
 
     print 'Hello ',my.name
     print 'Twitter Friends: ',my.friends_count
-    #there are other cool analytics you can show here
 
     return api
 
+def getImageAndSave(url):
+    """opens a url and ingests the sites source code"""
+    print url
+    soup = requests.get(url,verify=False) #ignore the SSL connection cert
+    #save the source code just in case you want to run offline
+    saveFile = open('temp.jpg','wb')
+    saveFile.write(soup.content)
+    saveFile.close()
 
+    print "I saved a local copy of the image to temp.jpg"
+    #return soup.content
+
+
+def tweet(someText):
+    """App portion that does the posting"""
+    if someText is not None and someText != "":
+        api.update_status(someText)
+        print "You just tweeted: ",someText
+
+
+def tweet_image(url, message):
+    filename = 'temp.jpg'
+    request = requests.get(url, verify=False,stream=True)
+    if request.status_code == 200:
+        imageName = getImageAndSave(url)
+        raw_input("hold before posting")
+        api.update_with_media(filename, status=message)
+        os.remove(filename)
+    else:
+        print("Unable to download image")
+
+        
 def tweetScheduled():
     """function used to send scheduled posts"""
-    countT = 1 #I started from because i was getting a duplicate link
+    countT = 2
+    c=0
     alreadyTweeted = []
+    #get the visitedLinks database
+    visitedLinks = pd.read_csv('visitedLinks.csv')
+           
+    #put the urls 
     #loop through links and use time to stagger posts
-    for link in visitedLinks:
-        schedText = link
+    for index,schedText in visitedLinks.iterrows():
         #don't tweet an infinite loop
-        if countT == len(visitedLinks):
+        print c
+        if c == len(visitedLinks):
             print "All links have been tweeted...\n\n"
             return
         else:
-            if schedText != '':
+            if schedText['Links'] != '':
                 #in case something goes wrong ensure a tweet
                 try:
-                    i = countT - 1 #keep track of count
-                    startText = randomPhraseList[i]
-                    endText = closing[i]
-                    #merge the phrase hashtags and content
-                    newText = startText+ " " +endText+" "+schedText+""
+                    #i = countT - 1
+                    url = schedText['Links']
+                    imageURL = schedText['imageURL']
+                    startText = schedText['StartText']#randomPhraseList[i]
+                    endText = schedText['EndText']#closing[i]
+                    newText = startText+ " " +endText+" "+url+""
                     if newText not in alreadyTweeted:
                         alreadyTweeted.append(newText)
+                           
+                        #check to see if there is an image
+                        if imageURL != '':
+                            raw_input("hold")
+                            #post containing image
+                            #api.update_with_media(imageURL,status=newText)
+                            tweet_image(imageURL,newText)
+                            
+                        else:
+                            raw_input("hold")
+                            #post with no image
+                            api.update_status(newText)
+        
+
+                        #send a message confirming it worked
                         print "You just tweeted: ",newText
-                        api.update_status(newText)
                     else:
                         print "You already tweeted: ",newText
                         
                 except Exception,e:
                     print str(e)
-                    if schedText not in alreadyTweeted:
-                        #if some error, at least tweet the url
-                        alreadyTweeted.append(schedText)
-                        print "You just tweeted: ",schedText
-                        api.update_status(schedText)
-                    else:
-                        print "You already tweeted: ",schedText
+                    print "There was an erorr in the posting"
+                    raw_input("Please review...<ENTER>")
                         
  
                 print "\nStaggering..."
-                time.sleep(timeDelayTweets)
+                time.sleep(timeDelay)
                 
             else:
                 print "I dont tweet blank stuff..."
         countT += 1
-        
-def tweet(someText):
-    """if you just want a single tweet of 'someText' """
-    if someText is not None and someText != "":
-        api.update_status(someText)
-        print "You just tweeted: ",someText
+        c += 1
 
-def getTimeline(sinceId,maxId,count,page):
-    """returns count of the most recent statuses between sinceId and maxId"""
-    api.home_timeline(sinceId,maxId,count,page)
-
-
-class StdOutListener(StreamListener):
-    ''' Handles data received from the stream. '''
-    
-    def on_data(self, data):
-        try:
-
-            #make the data into a json object
-            #it looks like a dictionary anyway
-            all_data = json.loads(data)
-
-            tweetTime = all_data["created_at"]
-            tweet = all_data["text"]
-            username = all_data["user"]["screen_name"]
-
-            #who is saying what?
-            print "At ",tweetTime," ",username," says --\n ",tweet
-            print "\n Oh No they Didn\\'t!!!"
-
-            #where are they saying it from? in what language?
-            country = all_data["place"]["country"]
-            language = all_data["language"]
-
-            #are there any blogs we should follow that our consumers are talking about? 
-            #we can check our competitors blogs?
-            #maybe we should blog about topics they do or dont cover?
-            importantLinks = getLinks(tweet)
-
-
-            #get a unix timestamp
-            saveThis = str("User: "+username+" Text: "+tweet) #twitter uses colons sometimes so we have to some up with a different method
-
-            #save into a csv or a db
-            saveCSV = "N"
-
-            ###if you want to save to a csv
-            if saveCSV == "Y":
-                saveFile = open('twitDB.csv','a')
-                saveFile.write(saveThis)
-                saveFile.write('\n')
-                saveFile.close()
-
-            #keep the light on
-            return True
-
-        except BaseException,e:
-            print "failed ondata ",str(e)
-            time.sleep(5)
-
-    def on_status(self, status):
-        # Prints the text of the tweet
-        #print 'User: ',status.name
-        print 'Tweet text: ', status.text
- 
-        # There are many options in the status object,
-        # hashtags can be very easily accessed.
-        for hashtag in status.entries['hashtags']:
-            print hashtag['text']
-
-        #keep it going
-        return true
-
-    
-    def on_error(self, status_code):
-        print 'Got an error with status code: ', str(status_code)
-
-        #if you receive 420 error then you have hit a rate limit
-        if status_code == 420:
-            #stop streaming
-            return False
-        
-        else:
-            return True # To continue listening
- 
-    def on_timeout(self):
-        print 'Timeout...' 
-        return True # To continue listening
- 
- 
-def listenToChannels(channels):
-    """if you want to listen to certain channels, like your own, to check your post"""
-    #channels = ['DataScienceCtrl','KDnuggets','PyRunner','KirkDBorne']
-    print "Listening for: ",channels
-    listener = StdOutListener()
-    stream = Stream(auth, listener)
-    stream.filter(track=channels)
-
-####this is the web crawler portion
-def openPageGetSource(url):
-    """opens a url and ingests the sites source code"""
-    
-    try:
-        soup = urlopen(url).read()
-    except Exception,e:
-        print str(e)
-        
-    #save the source code just in case you want to run offline
-    saveFile = open('source.txt','w')
-    saveFile.write(soup)
-    saveFile.write('\n')
-    saveFile.close()
-    
-    return soup
-
-def makeLinkList():
-    """mine my website to grab the links to tweet about"""
-
-    #get the RSS feed
-    randomURL = 'I USED MY RSS FEED HERE'
-    
-    #arrays that we will write to
-    aLinks = []
-    pContent = []
-    wordArray = []
-
-    
-    #get the page
-    sourceCode = openPageGetSource(randomURL)
-    soup = BeautifulSoup(sourceCode)
-    #print soup.prettify()
-    
-    for a in soup.body.find_all('a', href=True):
-        link = a['href']
-        #first level data check
-        if link not in visitedLinks and link not in badList and "automatemylife.org" in link and "-" in link and "category" not in link:
-            #second level data check
-            if "#" not in link:
-                visitedLinks.append(link)
-                print "Found --> ",link
-
-    #print visitedLinks
-
-    #lets save the links to csv
-    linkDF = pd.DataFrame(visitedLinks,columns=['Links'])
-    linkDF.to_csv('visitedLinks.csv')
-    
     
 def makeSchedule(job,interval):
-    """takes a target function 'job' and time 'interval' to schedule"""
-    #i wrote it to read number and unit combinations
+    """Morning, Afternoon or Evening"""
     if 'sec' in interval:
         print "Scheduling ",interval
         interval = int(interval.replace('sec',''))
@@ -339,35 +193,29 @@ def makeSchedule(job,interval):
         print interval
         schedule.every().wednesday.at(interval).do(job)
 
-    #run it
     while True:
         schedule.run_pending()
         time.sleep(1)
 
-##main loop of the code
+
 def runAMLautoPoster():
     """the RUN function for Automate My Lifes automated Twitter Scheduler"""
     
     ###this is a twitter post job
-    interval = '4hr'
+    interval = '30min'
     job = tweetScheduled
     makeSchedule(job,interval)
 
-    ###this is a day schedule to make new posts on RSS feed
+    ###this is a schedule to check for new posts on RSS feed
     interval = '10:30wed'
     job = makeLinkList
     makeSchedule(job,interval)
 
 
 #sign in
+#makeLinkList()
 api = signIntoTwitter()
-makeLinkList() #dont forget to make this
-runAMLautoPoster()
-
-#give me a shotout when you run my code
-listenToChannels(['PyRunner'])
-tweet("Thanks for the awesome code! @PyRunner")
-
-
+t = threading.Thread(target=runAMLautoPoster())
+t.start()
 
 
