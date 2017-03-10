@@ -102,6 +102,7 @@ def tweetScheduled():
     c=0
     alreadyTweeted = []
     #get the visitedLinks database
+    ##headers should be [index,Links,StartText,EndText,imageURL]
     visitedLinks = pd.read_csv('visitedLinks.csv')
            
     #put the urls 
