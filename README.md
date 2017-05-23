@@ -15,3 +15,5 @@ autoWordCloud -- generating a WordCloud after your mine your own website!!
 
 autoWebCrawl -- extracts links as well as images from a website using BS4
 
+autoAnalytics -- grabbing Google AdSense and Analytics reports for your convenience
+
